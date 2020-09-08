@@ -72,5 +72,41 @@ def getProductByID(id):
 
     return make_response(jsonify({"product": product}))
 
+@app.route('/products/<id>', methods=['PUT'])
+def updateProduct(id):
+    data = request.json()
+    get_product = Product.query.get(id)
+
+    print(data)
+
+    if data.get('title'):
+        get_product.title = data['title']
+
+    if data.get('productDescription'):
+        get_product.productDescription = data['productDescription']
+
+    if data.get('productBrand'):
+        get_product.productBrand = data['productBrand']
+
+    if data.get('price'):
+        get_product.price= data['price']
+
+    db.session.add(get_product)
+    db.session.commit()
+
+    product_schema = ProductSchema(only=['id', 'title', 'productDescription','productBrand','price'])
+    product = product_schema.dump(get_product)
+
+    return make_response(jsonify({"product": product}))
+
+@app.route('/products/<id>', methods = ['DELETE'])
+def deleteProduct(id):
+    get_product = Product.query.get(id)
+    db.session.delete(get_product)
+    db.session.commit()
+
+    return make_response("",204)
+@app.route('/products', methods = ['POST'])
+
 if __name__ == "__main__":
     app.run(debug=True)
